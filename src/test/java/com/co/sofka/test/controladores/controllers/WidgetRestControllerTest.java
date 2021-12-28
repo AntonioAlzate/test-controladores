@@ -88,7 +88,7 @@ class WidgetRestControllerTest {
     @Test
     @DisplayName("PUT /rest/proper/widget/{id}")
     void testUpdateWidget() throws Exception {
-        Widget widgetToUpdate = new Widget(1L,"Widget update", "This is my widget update", 1);
+        Widget widgetToUpdate = new Widget(1L, "Widget update", "This is my widget update", 1);
         Widget widgetToReturn = new Widget(1L, "Widget update", "This is my widget update", 2);
 
         doReturn(Optional.of(widgetToUpdate)).when(service).findById(1L);
@@ -104,6 +104,21 @@ class WidgetRestControllerTest {
                 .andExpect(jsonPath("$.name", is("Widget update")))
                 .andExpect(jsonPath("$.description", is("This is my widget update")))
                 .andExpect(jsonPath("$.version", is(2)));
+    }
+
+    @Test
+    @DisplayName("Put /rest/proper/widget/1 - Not Found")
+    void testPutWidgetByIdNotFound() throws Exception {
+
+        Widget widgetToUpdate = new Widget(1L, "Widget update", "This is my widget update", 1);
+
+        doReturn(Optional.empty()).when(service).findById(1l);
+
+        mockMvc.perform(put("/rest/proper/widget/{id}", 1L)
+                .header("If-Match", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(widgetToUpdate)))
+                .andExpect(status().isNotFound());
     }
 
     static String asJsonString(final Object obj) {
