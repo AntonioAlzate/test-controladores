@@ -66,6 +66,23 @@ class WidgetRestControllerTest {
     }
 
     @Test
+    @DisplayName("GET /rest/widget/1 - EXIST")
+    void testGetWidgetByIdExist() throws Exception {
+        Widget widgetToReturn = new Widget(1L, "Widget Name", "Description", 1);
+        doReturn(Optional.of(widgetToReturn)).when(service).findById(1l);
+
+        mockMvc.perform(get("/rest/widget/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header().string(HttpHeaders.LOCATION, "/rest/widget/1"))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("Widget Name")))
+                .andExpect(jsonPath("$.description", is("Description")))
+                .andExpect(jsonPath("$.version", is(1)));
+
+    }
+
+    @Test
     @DisplayName("POST /rest/widget")
     void testCreateWidget() throws Exception {
         Widget widgetToPost = new Widget("New Widget", "This is my widget");
